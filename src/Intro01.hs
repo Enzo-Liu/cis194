@@ -32,10 +32,10 @@ listLength []     = 0
 listLength (_:xs) = 1 + listLength xs
 
 lastDigit :: Integer -> Integer
-lastDigit = flip mod 10
+lastDigit = (`mod` 10)
 
 dropLastDigit :: Integer -> Integer
-dropLastDigit =  flip div 10
+dropLastDigit =  (`div` 10)
 
 toRevDigits :: Integer -> [Integer]
 toRevDigits n
@@ -54,7 +54,7 @@ checksum :: Integer -> Integer
 checksum = sumDigits . doubleEveryOther . toRevDigits
 
 luhn :: Integer -> Bool
-luhn = (== 0) . (flip mod 10) . checksum
+luhn = (== 0) . (`mod` 10) . checksum
 
 type Peg = String
 type Move = (Peg, Peg)
