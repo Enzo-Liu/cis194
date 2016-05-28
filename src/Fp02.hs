@@ -81,7 +81,10 @@ solveDumb s = filter right (map (getMove s) all)
         right (Move g e n) = e == l
 
 solve :: Code -> [Move]
-solve = undefined
+solve s = choose . allCodes . length $ s
+  where choose [] = []
+        choose (x:xs) = let m = getMove s x in
+          m : choose (filter (isConsistent m) xs)
 
 -- Bonus ----------------------------------------------
 
