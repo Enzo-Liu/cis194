@@ -1,6 +1,10 @@
 module Intro01
-    ( luhn
-    ) where
+  (
+    luhn
+  , hanoi
+  , hanoi4
+  )
+where
 
 import Control.Monad
 
@@ -51,3 +55,22 @@ checksum = sumDigits . doubleEveryOther . toRevDigits
 
 luhn :: Integer -> Bool
 luhn = (== 0) . (flip mod 10) . checksum
+
+type Peg = String
+type Move = (Peg, Peg)
+hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
+hanoi n a b c
+  | n <= 0 = []
+  | otherwise = (hanoi (n-1) a c b) ++ [(a,b)] ++ (hanoi (n-1) c b a)
+
+
+hanoi4 :: Integer -> Peg -> Peg -> Peg -> Peg -> [Move]
+hanoi4 n a b c d
+  | n <= 0 = []
+  | n == 1 = [(a,b)]
+  | otherwise =
+      (hanoi4 k a c b d) ++
+      (hanoi (n-k) a b d) ++
+      (hanoi4 k c b a d)
+    -- this is copyed from wiki [https://en.wikipedia.org/wiki/Tower_of_Hanoi#Frame.E2.80.93Stewart_algorithm]
+    where k = n - (round . sqrt . fromInteger $ (2*n+1)) +1
