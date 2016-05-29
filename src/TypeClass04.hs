@@ -75,16 +75,20 @@ instance Num a => Num (Poly a) where
 -- Exercise 7 -----------------------------------------
 
 applyP :: Num a => Poly a -> a -> a
-applyP = undefined
+applyP (P l) a = sum $ map (apply a) (zip [0..] l)
+  where apply a (d,c) = (a^d)*c
 
 -- Exercise 8 -----------------------------------------
 
 class Num a => Differentiable a where
     deriv  :: a -> a
     nderiv :: Int -> a -> a
-    nderiv = undefined
+    nderiv 0 y = y
+    nderiv n f = nderiv (n-1) (deriv f)
 
 -- Exercise 9 -----------------------------------------
 
 instance Num a => Differentiable (Poly a) where
-    deriv = undefined
+  deriv (P []) = P []
+  deriv (P l)  = P (zipWith (*) numList (tail l))
+    where numList = 1 : map (+1) numList
