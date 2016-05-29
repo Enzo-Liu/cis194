@@ -15,7 +15,10 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Intro01, Fp02, Adt03
+  exposed-modules:     Intro01
+                     , Fp02
+                     , Adt03
+                     , TypeClass04
   build-depends:       base >= 4.7 && < 5
   default-language:    Haskell2010
 
