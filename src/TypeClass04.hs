@@ -3,8 +3,6 @@ module TypeClass04
 
   )
 where
-import Data.List
-
 newtype Poly a = P [a]
 
 -- Exercise 1 -----------------------------------------
@@ -16,9 +14,9 @@ x = P [0,1]
 
 instance (Num a, Eq a) => Eq (Poly a) where
   P [] == P [] = True
-  P (x:xs) == P [] = x == 0 && P xs == P []
-  P [] == P y@(_:[]) = P y == P []
-  P (x:xs) == P (y:ys) = x == y && P xs == P ys
+  P [] == P y = P y == P []
+  P (x':xs) == P [] = x' == 0 && P xs == P []
+  P (x':xs) == P (y:ys) = x' == y && P xs == P ys
 
 -- Exercise 3 -----------------------------------------
 joinList :: String -> [String] -> String
@@ -43,6 +41,7 @@ instance (Num a, Eq a, Show a) => Show (Poly a) where
 
 -- Exercise 4 -----------------------------------------
 
+plusList :: Num t => [t] -> [t] -> [t]
 plusList xs' [] = xs'
 plusList [] ys' = ys'
 plusList (x':xs') (y':ys') = (x'+y'):plusList xs' ys'
@@ -54,10 +53,12 @@ plus (P xs) (P ys) = P (plusList xs ys)
 
 times :: Num a => Poly a -> Poly a -> Poly a
 times (P a) (P b) = P (foldl plusList ([]) $ timesList a b)
-  where timesList a b = map (plusC a) $ zip [0..] b
+  where timesList a' b' = map (plusC a') $ zip numList b'
         plusC l (d,c) = fill0 d $ map (*c) l
         fill0 0 l  = l
         fill0 n l  = fill0 (n-1) (0:l)
+        numList = (0::Integer) : map (+1) numList
+
 
 -- Exercise 6 -----------------------------------------
 
