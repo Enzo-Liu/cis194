@@ -19,7 +19,12 @@ library
                      , Fp02
                      , Adt03
                      , TypeClass04
+                     , IO05
   build-depends:       base >= 4.7 && < 5
+                     , bytestring
+                     , containers
+                     , aeson
+                     , text
   default-language:    Haskell2010
 
 executable cis194-exe
