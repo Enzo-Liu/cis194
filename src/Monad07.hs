@@ -37,25 +37,33 @@ getElts xs v = mapM (v !?) xs
 type Rnd a = Rand StdGen a
 
 randomElt :: Vector a -> Rnd (Maybe a)
-randomElt = undefined
+randomElt v = liftM (v !?) $ getRandomR (0,V.length v)
 
 -- Exercise 4 -----------------------------------------
 
 randomVec :: Random a => Int -> Rnd (Vector a)
-randomVec = undefined
+randomVec n = liftM V.fromList $ sequence (replicate n getRandom)
 
 randomVecR :: Random a => Int -> (a, a) -> Rnd (Vector a)
-randomVecR = undefined
+randomVecR n r = liftM V.fromList $ sequence (replicate n $ getRandomR r)
 
 -- Exercise 5 -----------------------------------------
+unsafeSwap :: Vector a -> [(Int, Int)] -> Vector a
+unsafeSwap v []= v
+unsafeSwap v ((from,to):xs) = unsafeSwap (v // [(from,v!to), (to, v!from)]) xs
 
 shuffle :: Vector a -> Rnd (Vector a)
-shuffle = undefined
+shuffle v | V.length v == 0 = return v
+shuffle v = liftM (unsafeSwap v) $ mapM randomPair $ reverse [0 .. V.length v -1 ]
+  where randomPair i = liftM (\r->(i,r)) $ getRandomR (0,i)
 
 -- Exercise 6 -----------------------------------------
 
 partitionAt :: Ord a => Vector a -> Int -> (Vector a, a, Vector a)
-partitionAt = undefined
+partitionAt v i = (less, pivot, more)
+  where pivot = v!i
+        v' = V.take i v V.++ V.drop (i+1) v
+        (less,more) = V.partition (< pivot) v'
 
 -- Exercise 7 -----------------------------------------
 
@@ -66,18 +74,37 @@ quicksort (x:xs) = quicksort [ y | y <- xs, y < x ]
                    <> (x : quicksort [ y | y <- xs, y >= x ])
 
 qsort :: Ord a => Vector a -> Vector a
-qsort = undefined
+qsort v | V.null v = v
+qsort v = qsort [ y | y <- r, y < h ] V.++
+          V.singleton h V.++
+          qsort [ y | y <- r, y >= h ]
+  where h = V.head v
+        r = V.tail v
 
 -- Exercise 8 -----------------------------------------
 
 qsortR :: Ord a => Vector a -> Rnd (Vector a)
-qsortR = undefined
+qsortR v | V.null v = return v
+qsortR v = do
+  i <- getRandomR (0,length v -1)
+  let (less,pivot,more) = partitionAt v i
+  orderedLess <- qsortR less
+  orderedMore <- qsortR more
+  return $ orderedLess V.++ V.singleton pivot V.++ orderedMore
 
 -- Exercise 9 -----------------------------------------
 
 -- Selection
 select :: Ord a => Int -> Vector a -> Rnd (Maybe a)
-select = undefined
+select r v | r < 0 || r >= length v = return Nothing
+select r v = do
+  i <- getRandomR (0,length v -1)
+  let (less,pivot,more) = partitionAt v i
+      ll = length less
+  case compare ll r of
+    LT -> select (r-ll-1) more
+    EQ -> return $ Just pivot
+    GT -> select r less
 
 -- Exercise 10 ----------------------------------------
 
@@ -100,7 +127,6 @@ getCards = undefined
 -- Exercise 13 ----------------------------------------
 
 data State = State { money :: Int, deck :: Deck }
-
 repl :: State -> IO ()
 repl s@State{..} | money <= 0  = putStrLn "You ran out of money!"
                  | V.null deck = deckEmpty
