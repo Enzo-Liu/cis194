@@ -7,6 +7,7 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.ByteString.Lazy (ByteString)
 import Data.Map.Strict (Map)
+import Data.List
 import System.Environment (getArgs)
 import Data.Word
 
@@ -71,7 +72,21 @@ getCriminal mp = head . Map.keys $ Map.filter (== m) mp
 -- Exercise 7 -----------------------------------------
 
 undoTs :: Map String Integer -> [TId] -> [Transaction]
-undoTs _ _= []
+undoTs mp tids = go payer payee tids
+  where (payerMap,payeeMap) = Map.partition (<0) $ Map.filter (/=0) mp
+        order = sortBy (\(_,v1) (_,v2)-> compare v2 v1) . Map.toList
+          :: Map String Integer -> [(String,Integer)]
+        payer =  order payerMap
+        payee =  order payeeMap
+        go _ [] _ = []
+        go [] _ _ = []
+        go _ _ [] = []
+        go ((pr,m):xs) ((pe,n):ys) (t:ts) = let s = m + n in case compare s 0 of
+          GT -> (Transaction pe pr (-m) t) : go xs ((pe,s):ys) ts
+          EQ -> (Transaction pe pr n t) : go xs ys ts
+          LT -> (Transaction pe pr n t) : go ((pr,s):xs) ys ts
+
+
 
 -- Exercise 8 -----------------------------------------
 
