@@ -8,6 +8,7 @@ import Cards
 import Control.Monad hiding (mapM, liftM)
 import Control.Monad.Random
 import Data.Functor
+import Data.Function
 import Data.Monoid
 import Data.Vector (Vector, cons, (!), (!?), (//))
 import System.Random
@@ -109,20 +110,26 @@ select r v = do
 -- Exercise 10 ----------------------------------------
 
 allCards :: Deck
-allCards = undefined
+allCards = [Card label suit | suit <- suits, label <- labels]
 
 newDeck :: Rnd Deck
-newDeck =  undefined
+newDeck =  shuffle allCards
 
 -- Exercise 11 ----------------------------------------
 
 nextCard :: Deck -> Maybe (Card, Deck)
-nextCard = undefined
+nextCard d | V.null d = Nothing
+nextCard d = Just (V.head d, V.tail d)
 
 -- Exercise 12 ----------------------------------------
 
 getCards :: Int -> Deck -> Maybe ([Card], Deck)
-getCards = undefined
+getCards n = go []
+  where go cards deck
+          | length cards >= n = return (cards, deck)
+          | otherwise         = do
+              (card, deck') <- nextCard deck
+              go (cards ++ [card]) deck'
 
 -- Exercise 13 ----------------------------------------
 
