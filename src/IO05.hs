@@ -3,20 +3,20 @@ module IO05
 
   )
 where
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.ByteString.Lazy (ByteString)
-import Data.Map.Strict (Map)
-import Data.List
-import System.Environment (getArgs)
-import Data.Word
+import           Data.ByteString.Lazy (ByteString)
+import           Data.List
+import           Data.Map.Strict      (Map)
+import           Data.Set             (Set)
+import qualified Data.Set             as Set
+import           Data.Word
+import           System.Environment   (getArgs)
 
-import Control.Applicative
+import           Control.Applicative
+import           Data.Bits
 import qualified Data.ByteString.Lazy as BS
-import qualified Data.Map.Strict as Map
-import Data.Bits
+import qualified Data.Map.Strict      as Map
 
-import Parser
+import           Parser
 
 -- Exercise 1 -----------------------------------------
 
@@ -45,10 +45,10 @@ parseFile p = decode <$> BS.readFile p
 
 -- Exercise 4 -----------------------------------------
 isIn :: Transaction -> Set TId -> Bool
-isIn t s = Set.member (tid t) s
+isIn t = Set.member (tid t)
 
 exclude :: [TId] -> [Transaction] -> [Transaction]
-exclude td ts = filter (`isIn` s) ts
+exclude td = filter (`isIn` s)
   where s = Set.fromList td
 
 getBadTs :: FilePath -> FilePath -> IO (Maybe [Transaction])
@@ -61,7 +61,7 @@ getBadTs vf tf = do
 
 getFlow :: [Transaction] -> Map String Integer
 getFlow [] = Map.empty
-getFlow ((Transaction from to amount _):xs) = Map.insertWith (+) from (-amount) $ Map.insertWith (+) to amount $ getFlow xs
+getFlow (Transaction from to amount _:xs) = Map.insertWith (+) from (-amount) $ Map.insertWith (+) to amount $ getFlow xs
 
 -- Exercise 6 -----------------------------------------
 
@@ -72,7 +72,7 @@ getCriminal mp = head . Map.keys $ Map.filter (== m) mp
 -- Exercise 7 -----------------------------------------
 
 undoTs :: Map String Integer -> [TId] -> [Transaction]
-undoTs mp tids = go payer payee tids
+undoTs mp = go payer payee
   where (payerMap,payeeMap) = Map.partition (<0) $ Map.filter (/=0) mp
         order = sortBy (\(_,v1) (_,v2)-> compare v2 v1) . Map.toList
           :: Map String Integer -> [(String,Integer)]
@@ -82,9 +82,9 @@ undoTs mp tids = go payer payee tids
         go [] _ _ = []
         go _ _ [] = []
         go ((pr,m):xs) ((pe,n):ys) (t:ts) = let s = m + n in case compare s 0 of
-          GT -> (Transaction pe pr (-m) t) : go xs ((pe,s):ys) ts
-          EQ -> (Transaction pe pr n t) : go xs ys ts
-          LT -> (Transaction pe pr n t) : go ((pr,s):xs) ys ts
+          GT -> Transaction pe pr (-m) t : go xs ((pe,s):ys) ts
+          EQ -> Transaction pe pr n t : go xs ys ts
+          LT -> Transaction pe pr n t : go ((pr,s):xs) ys ts
 
 
 
