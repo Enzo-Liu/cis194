@@ -7,11 +7,8 @@ import Cards
 
 import Control.Monad hiding (mapM, liftM)
 import Control.Monad.Random
-import Data.Functor
-import Data.Function
 import Data.Monoid
 import Data.Vector (Vector, cons, (!), (!?), (//))
-import System.Random
 
 import qualified Data.Vector as V
 
