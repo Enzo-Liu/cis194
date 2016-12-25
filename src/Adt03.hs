@@ -38,10 +38,10 @@ type State = String -> Int
 -- Exercise 1 -----------------------------------------
 
 extend :: State -> String -> Int -> State
-extend st s i = \(s') -> if s' == s then i else st s'
+extend st s i s' = if s' == s then i else st s'
 
 empty :: State
-empty = \_->0
+empty _ = 0
 
 -- Exercise 2 -----------------------------------------
 

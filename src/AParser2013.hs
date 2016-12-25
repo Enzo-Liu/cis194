@@ -107,7 +107,7 @@ spaces :: Parser String
 spaces = zeroOrMore $ satisfy isSpace
 
 ident :: Parser String
-ident = (:) <$> satisfy isAlpha <*> (zeroOrMore $ satisfy isAlphaNum)
+ident = (:) <$> satisfy isAlpha <*> zeroOrMore (satisfy isAlphaNum)
 
 ------------------------------------------------------------
 --  3. Parsing S-expressions
@@ -133,6 +133,6 @@ parseAtom = (N <$> posInt) <|> (I <$> ident)
 parseSExpr :: Parser SExpr
 parseSExpr = withSpaces $ parseA <|> parseC
   where parseA = A <$> parseAtom
-        parseC = Comb <$> (inBrackets $ oneOrMore parseSExpr)
+        parseC = Comb <$> inBrackets (oneOrMore parseSExpr)
         inBrackets p = char '('  *> p <* char ')'
         withSpaces p = spaces *> p <* spaces
