@@ -128,7 +128,7 @@ data SExpr = A Atom
   deriving Show
 
 parseAtom :: Parser Atom
-parseAtom = ((\i-> N i) <$> posInt) <|> ((\id'->I id') <$> ident)
+parseAtom = (N <$> posInt) <|> (I <$> ident)
 
 parseSExpr :: Parser SExpr
 parseSExpr = withSpaces $ parseA <|> parseC
